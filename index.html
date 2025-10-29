@@ -3,29 +3,29 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>FakeGen Pro</title>
+    <title>S4X FakeGen</title>
 
-    <!-- PyScript (Official Stable CDN) -->
+    <!-- PyScript -->
     <link rel="stylesheet" href="https://pyscript.net/releases/2024.10.1/core.css">
     <script type="module" src="https://pyscript.net/releases/2024.10.1/core.js"></script>
 
     <style>
         :root {
             --bg: #f0f4f8;
-            --card: rgba(255, 255, 255, 0.9);
-            --glass: rgba(255, 255, 255, 0.15);
+            --card: rgba(255, 255, 255, 0.92);
+            --glass: rgba(255, 255, 255, 0.18);
             --text: #1e293b;
             --primary: #4361ee;
             --success: #06d6a0;
-            --border: rgba(255, 255, 255, 0.3);
+            --border: rgba(255, 255, 255, 0.35);
             --shadow: 0 12px 40px rgba(0,0,0,0.15);
         }
         [data-theme="dark"] {
             --bg: #0f172a;
-            --card: rgba(30, 41, 59, 0.95);
-            --glass: rgba(255, 255, 255, 0.08);
+            --card: rgba(30, 41, 59, 0.96);
+            --glass: rgba(255, 255, 255, 0.1);
             --text: #e2e8f0;
-            --border: rgba(255, 255, 255, 0.12);
+            --border: rgba(255, 255, 255, 0.15);
             --shadow: 0 12px 40px rgba(0,0,0,0.5);
         }
 
@@ -39,7 +39,7 @@
             align-items: center;
             justify-content: center;
             padding: 1rem;
-            transition: background 0.4s ease;
+            transition: 0.4s;
         }
 
         .container {
@@ -50,16 +50,29 @@
             border: 1px solid var(--border);
             box-shadow: var(--shadow);
             width: 100%;
-            max-width: 480px;
-            padding: 2.8rem 2.2rem;
+            max-width: 500px;
+            padding: 2.8rem 2.3rem;
             position: relative;
-            overflow: hidden;
             animation: fadeIn 0.7s ease-out;
         }
 
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(30px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* S4X Logo */
+        .logo {
+            position: absolute;
+            top: 1.3rem;
+            left: 1.3rem;
+            font-size: 1.8rem;
+            font-weight: 900;
+            background: linear-gradient(90deg, #ff6b6b, #4361ee);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+            z-index: 10;
         }
 
         .theme-toggle {
@@ -74,7 +87,7 @@
             justify-content: center;
             cursor: pointer;
             font-size: 1.4rem;
-            transition: all 0.3s ease;
+            transition: 0.3s;
             z-index: 10;
         }
         .theme-toggle:hover {
@@ -87,11 +100,10 @@
             text-align: center;
             font-size: 2.1rem;
             font-weight: 800;
-            margin-bottom: 0.6rem;
+            margin: 2.5rem 0 0.6rem;
             background: linear-gradient(90deg, var(--primary), #ff6b6b);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            letter-spacing: -0.8px;
         }
         .tagline {
             text-align: center;
@@ -101,15 +113,12 @@
             font-weight: 500;
         }
 
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
+        .form-group { margin-bottom: 1.5rem; }
         label {
             display: block;
             margin-bottom: 0.7rem;
             font-weight: 600;
             font-size: 1rem;
-            color: var(--text);
         }
         select, input[type=number] {
             width: 100%;
@@ -119,8 +128,7 @@
             background: var(--glass);
             color: var(--text);
             font-size: 1.05rem;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
+            transition: 0.3s;
         }
         select:focus, input:focus {
             outline: none;
@@ -135,7 +143,6 @@
             gap: 0.8rem;
             margin-top: 1rem;
             font-size: 1rem;
-            color: var(--text);
         }
         .checkbox input { accent-color: var(--primary); }
 
@@ -148,9 +155,7 @@
             font-weight: 700;
             font-size: 1.15rem;
             cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
+            transition: 0.3s;
             box-shadow: 0 8px 24px rgba(0,0,0,0.2);
         }
         .btn-generate {
@@ -161,37 +166,46 @@
             transform: translateY(-4px);
             box-shadow: 0 14px 32px rgba(67, 97, 238, 0.4);
         }
-        .btn-copy {
-            background: var(--success);
-            color: white;
-            display: none;
-        }
-        .btn-copy:hover {
-            background: #05b589;
-            transform: translateY(-4px);
-        }
-        .btn-copy.copied {
-            background: #05b589;
-        }
 
-        .output {
+        /* Output Section */
+        .output-section {
             background: rgba(0,0,0,0.07);
             padding: 1.4rem;
             border-radius: 16px;
             margin: 1.4rem 0;
-            font-family: 'Courier New', monospace;
-            font-size: 1.25rem;
-            font-weight: 600;
-            word-break: break-all;
             border: 1px dashed var(--border);
             display: none;
             animation: popIn 0.5s ease-out;
-            text-align: center;
-            color: var(--text);
+            position: relative;
         }
         @keyframes popIn {
             from { opacity: 0; transform: scale(0.92); }
             to { opacity: 1; transform: scale(1); }
+        }
+        .output-text {
+            font-family: 'Courier New', monospace;
+            font-size: 1.25rem;
+            font-weight: 600;
+            word-break: break-all;
+            text-align: center;
+            color: var(--text);
+            margin-bottom: 1rem;
+        }
+        .btn-copy {
+            background: var(--success);
+            color: white;
+            font-size: 1rem;
+            padding: 0.8rem;
+            border-radius: 12px;
+            display: none;
+            width: 100%;
+        }
+        .btn-copy:hover {
+            background: #05b589;
+            transform: translateY(-2px);
+        }
+        .btn-copy.copied {
+            background: #05b589;
         }
 
         .footer {
@@ -204,17 +218,23 @@
         @media (max-width: 480px) {
             .container { padding: 2.2rem 1.6rem; }
             h1 { font-size: 1.8rem; }
+            .logo { font-size: 1.6rem; }
         }
     </style>
 </head>
 <body>
 
 <div class="container">
+    <!-- S4X Logo -->
+    <div class="logo">S4X</div>
+
+    <!-- Theme Toggle -->
     <button class="theme-toggle" id="themeToggle">Dark Mode</button>
 
     <h1>FakeGen Pro</h1>
-    <p class="tagline">Generate fake email + strong password instantly</p>
+    <p class="tagline">Generate fake email + strong password</p>
 
+    <!-- Form -->
     <div class="form-group">
         <label for="emailType">Email Style</label>
         <select id="emailType">
@@ -234,24 +254,27 @@
 
     <button class="btn-generate" id="generateBtn">Generate Email:Password</button>
 
-    <div id="result" class="output"></div>
-    <button id="copyBtn" class="btn-copy">Copy All</button>
+    <!-- Output Section -->
+    <div id="outputSection" class="output-section">
+        <div id="result" class="output-text"></div>
+        <button id="copyBtn" class="btn-copy">Copy All</button>
+    </div>
 
     <div class="footer">
-        Powered by <strong>PyScript</strong> • 100% Client-Side • No Data Sent
+        Powered by <strong>PyScript</strong> • 100% Client-Side
     </div>
 </div>
 
-<!-- Python Code (PyScript) -->
+<!-- Python Code -->
 <py-script>
 import random
 import string
 from js import document, navigator, setTimeout
 
-# === Data ===
-first_names = ['John','Jane','Alex','Maria','Chris','Taylor','Jordan','Casey','Morgan','Riley','Sam','Avery','Quinn']
-last_names  = ['Smith','Doe','Brown','Lee','Kim','Patel','Garcia','Wong','Nguyen','Ali','Khan','Chen','Lopez','Martinez']
-domains     = ['gmail.com','outlook.com','yahoo.com','proton.me','icloud.com','zoho.com','mail.com','yandex.com','aol.com']
+# Data
+first_names = ['John','Jane','Alex','Maria','Chris','Taylor','Jordan','Casey','Morgan','Riley','Sam','Avery','Quinn','Drew']
+last_names  = ['Smith','Doe','Brown','Lee','Kim','Patel','Garcia','Wong','Nguyen','Ali','Khan','Chen','Lopez','Martinez','Silva']
+domains     = ['gmail.com','outlook.com','yahoo.com','proton.me','icloud.com','zoho.com','mail.com','yandex.com','aol.com','gmx.com']
 
 def rand_choice(lst):
     return random.choice(lst)
@@ -259,14 +282,14 @@ def rand_choice(lst):
 def random_string(n):
     return ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(n))
 
-# === Email ===
+# Email
 def make_email(style):
     if style == 'fake':
         return f"{rand_choice(first_names).lower()}.{rand_choice(last_names).lower()}@{rand_choice(domains)}"
     else:
         return f"{random_string(12)}@tempmail.example"
 
-# === Password ===
+# Password
 def make_password(length, symbols):
     length = max(8, int(length))
     chars = string.ascii_letters + string.digits
@@ -287,7 +310,7 @@ def make_password(length, symbols):
     random.shuffle(pwd)
     return ''.join(pwd)
 
-# === Generate ===
+# Generate
 def generate(*args):
     style = document.getElementById('emailType').value
     length = document.getElementById('passLength').value
@@ -297,18 +320,20 @@ def generate(*args):
     pwd = make_password(length, symbols)
     line = f"{email}:{pwd}"
 
+    # Show output
+    output_section = document.getElementById('outputSection')
     result = document.getElementById('result')
-    result.textContent = line
-    result.style.display = 'block'
-
     copy_btn = document.getElementById('copyBtn')
+
+    result.textContent = line
+    output_section.style.display = 'block'
     copy_btn.style.display = 'block'
     copy_btn.textContent = "Copy All"
     copy_btn.classList.remove('copied')
 
     window.last_line = line
 
-# === Copy ===
+# Copy
 def copy(*args):
     navigator.clipboard.writeText(window.last_line)
     btn = document.getElementById('copyBtn')
@@ -316,7 +341,7 @@ def copy(*args):
     btn.classList.add('copied')
     setTimeout(lambda: (setattr(btn, 'textContent', 'Copy All'), btn.classList.remove('copied')), 2000)
 
-# === Theme Toggle ===
+# Theme
 def toggle_theme(*args):
     body = document.querySelector('body')
     is_dark = body.getAttribute('data-theme') == 'dark'
@@ -324,7 +349,7 @@ def toggle_theme(*args):
     body.setAttribute('data-theme', new_theme or '')
     document.getElementById('themeToggle').textContent = "Light Mode" if not is_dark else "Dark Mode"
 
-# === Bind Events ===
+# Events
 document.getElementById('generateBtn').addEventListener('click', generate)
 document.getElementById('copyBtn').addEventListener('click', copy)
 document.getElementById('themeToggle').addEventListener('click', toggle_theme)
