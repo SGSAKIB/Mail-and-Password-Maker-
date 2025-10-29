@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Fake Email:Password Generator</title>
+
+    <!-- PyScript CSS + JS -->
+    <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
+    <script defer src="https://pyscript.net/latest/pyscript.js"></script>
+
+    <style>
+        :root {
+            --primary: #007bff;
+            --success: #28a745;
+            --bg: #f4f4f4;
+            --card: #fff;
+        }
+        * { box-sizing: border-box; margin:0; padding:0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg);
+            display: flex;
+            justify-content: center;
+            padding: 1.5rem;
+            min-height: 100vh;
+        }
+        .card {
+            background: var(--card);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,.1);
+            width: 100%;
+            max-width: 420px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.4rem;
+            color: #222;
+        }
+        .section { margin-bottom: 1.2rem; }
+        label {
+            display: block;
+            margin-bottom: .4rem;
+            font-weight: 600;
+            font-size: .95rem;
+        }
+        select, input[type=number] {
+            width: 100%;
+            padding: .65rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+        .checkbox {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            margin: .6rem 0;
+            font-size: .95rem;
+        }
+        button {
+            width: 100%;
+            padding: .8rem;
+            margin-top: .8rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: .2s;
+        }
+        .btn-primary { background: var(--primary); color: #fff; }
+        .btn-primary:hover { background: #0056b3; }
+        .btn-success { background: var(--success); color: #fff; }
+        .btn-success:hover { background: #218838; }
+        .output {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-top: .8rem;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            word-break: break-all;
+            display: none;
+            border: 1px solid #eee;
+        }
+        .copy-all { margin-top: .8rem; display: none; }
+        @media (max-width: 480px) {
+            .card { padding: 1.5rem; }
+            h1 { font-size: 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h1>Python-Powered Generator</h1>
+
+    <div class="section">
+        <label for="emailType">Email Style</label>
+        <select id="emailType">
+            <option value="fake">Realistic (john.doe@gmail.com)</option>
+            <option value="temp">Temporary (abc123@tempmail.example)</option>
+        </select>
+    </div>
+
+    <div class="section">
+        <label for="passLength">Password Length</label>
+        <input type="number" id="passLength" value="14" min="8" max="50" />
+        <div class="checkbox">
+            <input type="checkbox" id="includeSymbols" checked />
+            <label for="includeSymbols">Include symbols (!@#$%…)</label>
+        </div>
+    </div>
+
+    <button class="btn-primary" pys-onClick="generate">Generate Email:Password</button>
+
+    <div id="result" class="output"></div>
+    <button id="copyBtn" class="btn-success copy-all" pys-onClick="copyToClipboard">Copy All</button>
+</div>
+
+<py-script>
+import random
+import string
+from js import document, navigator, setTimeout
+
+# --- Faker-style data ---
+first_names = ['John','Jane','Alex','Maria','Chris','Pat','Sam','Taylor','Jordan','Casey']
+last_names  = ['Smith','Doe','Brown','Lee','Kim','Patel','Garcia','Wong','Nguyen','Ali']
+domains     = ['gmail.com','outlook.com','yahoo.com','proton.me','tempmail.example']
+
+def rand_choice(lst):
+    return random.choice(lst)
+
+def random_string(length, chars=string.ascii_lowercase + string.digits):
+    return ''.join(random.choice(chars) for _ in range(length))
+
+# --- Generate Email ---
+def make_email(style):
+    if style == 'fake':
+        f = rand_choice(first_names).lower()
+        l = rand_choice(last_names).lower()
+        d = rand_choice(domains)
+        return f"{f}.{l}@{d}"
+    else:
+        user = random_string(10)
+        return f"{user}@tempmail.example"
+
+# --- Generate Strong Password ---
+def make_password(length, symbols):
+    if length < 4: length = 4
+    pools = {
+        'U': string.ascii_uppercase,
+        'L': string.ascii_lowercase,
+        'D': string.digits,
+        'S': '!@#$%^&*()_+-=[]{}|;:,.<>?' if symbols else ''
+    }
+    chars = pools['U'] + pools['L'] + pools['D'] + pools['S']
+
+    pwd = [
+        rand_choice(pools['U']),
+        rand_choice(pools['L']),
+        rand_choice(pools['D'])
+    ]
+    if symbols:
+        pwd.append(rand_choice(pools['S']))
+
+    while len(pwd) < length:
+        pwd.append(rand_choice(chars))
+
+    random.shuffle(pwd)
+    return ''.join(pwd)
+
+# --- Main Generate Function ---
+def generate(*args):
+    style = document.getElementById('emailType').value
+    length = int(document.getElementById('passLength').value)
+    symbols = document.getElementById('includeSymbols').checked
+
+    email = make_email(style)
+    password = make_password(length, symbols)
+    line = f"{email}:{password}"
+
+    # Show result
+    result_el = document.getElementById('result')
+    result_el.textContent = line
+    result_el.style.display = 'block'
+
+    copy_btn = document.getElementById('copyBtn')
+    copy_btn.style.display = 'block'
+
+    # Store for copy
+    window.last_generated = line
+
+# --- Copy to Clipboard ---
+def copyToClipboard(*args):
+    text = window.last_generated
+    navigator.clipboard.writeText(text).then(
+        lambda: None
+    )
+    btn = document.getElementById('copyBtn')
+    old = btn.textContent
+    btn.textContent = "Copied!"
+    setTimeout(lambda: setattr(btn, 'textContent', old), 1500)
+</py-script>
+
+</body>
+</html>
